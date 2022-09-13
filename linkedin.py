@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+import datetime
 import requests
 import sys
 import json
@@ -51,10 +52,17 @@ class linkedInClient():
 			for person in company["elements"]:
 				data = person["hitInfo"]["com.linkedin.voyager.search.SearchProfile"]["miniProfile"]
 				if data["firstName"] != "" or data["lastName"] != "":
-					employees.append([data['firstName'], data['lastName'], data['occupation'], person["hitInfo"]["com.linkedin.voyager.search.SearchProfile"]["location"]])
+					location = ""
+					if "hitInfo" in person and "com.linkedin.voyager.search.SearchProfile" in person["hitInfo"] and "location" in person["hitInfo"]["com.linkedin.voyager.search.SearchProfile"]:
+						location = person["hitInfo"]["com.linkedin.voyager.search.SearchProfile"]["location"]
+					else:
+						location = "Unknown"
+					employees.append([data['firstName'], data['lastName'], data['occupation'], location])
 					if self.outFile:
 						with open(arguments["outfile"], "a", encoding='utf8') as f:
 							f.write('"' + '","'.join(employees[-1]) + '"\n')
+				else:
+					pass
 			offset += increase
 		return employees
 
@@ -154,6 +162,11 @@ if __name__ == '__main__':
 
 
 	lengths = [10, 9, 8, 8]
+
+	day = datetime.date.today()
+	with open(f"employees-{day.strftime('%Y-%m-%d')}.json", "w") as f:
+		f.write(json.dumps(employees))
+
 	for employee in employees:
 		for i in range(len(employee)):
 			if lengths[i] < len(employee[i]):
