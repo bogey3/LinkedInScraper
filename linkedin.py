@@ -107,7 +107,7 @@ def usage():
 	\t-p\t\tPassword for logging in
 	\t--clear\t\tClear the stored cookies and force reauthentication
 
-    A username an password will be required if the stored cookies have expired, or if this is your first time running this script.
+	You will be prompted for a username and password if the stored cookies have expired, or if this is your first time running this script.
 
 	Example Usage:
 	\t{sys.argv[0]} -u user@email.com -p Password1 -c 1234567 -o ./output.csv
