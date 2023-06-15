@@ -23,6 +23,7 @@ class linkedInClient():
             "X-User-Locale": "en_US",
             "Accept-Language": "en-us",
             "x-restli-protocol-version": "2.0.0",
+            "Accept":"application/json"
         }
         cookies = requests.utils.dict_from_cookiejar(self.session.cookies)
         if "JSESSIONID" in cookies:
