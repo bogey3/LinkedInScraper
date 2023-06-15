@@ -10,41 +10,40 @@ Running the script with no parameters, or incorrect parameters will result in th
 LinkedIn Scraper
 
         Required:
-                -u              Username for logging in
-
-        Pick One:
                 -c              The company ID to scrape
-                -s              The search term to use for scraping
 
         Optional:
                 -o              The CSV file to write results to
+                -u              Username for logging in
                 -p              Password for logging in
+                --clear         Clear the stored cookies and force reauthentication
+
+    A username an password will be required if the stored cookies have expired, or if this is your first time running this script.
 
         Example Usage:
                 .\linkedin.py -u user@email.com -p Password1 -c 1234567 -o ./output.csv
-                .\linkedin.py -u user@email.com -p Password1 -s "Company Name Inc." -o ./output.csv
-                .\linkedin.py -u user@email.com -s "Company Name Inc."
 ```
-If you do not include a password argument, you will be prompted for the account's password.
+
+If you do not include a username or password argument and you don't already have a valid cookie, you will be prompted for the account's credentials.
 
 ## Output
 Console output will appear as below, you can also use the `-o` flag to output to a CSV file. 
 ```
-First Name      | Last Name         | Headline                                                                                                | Location                                     
-=============================================================================================================================================================================================
-Name            | Removed           | CEO                                                                                                     | Greater Chicago Area                         
-Name            | Removed           | Growth-focused CMO & GM                                                                                 | San Francisco Bay Area                       
-Name            | Removed           | Recruiting Manager                                                                                      | Norfolk, Virginia Area                       
-Name            | Removed           | Founder                                                                                                 | Other                                        
-Name            | Removed           | Customer Success executive & team leader passionate about growing mission-driven, technology businesses | San Francisco Bay Area                       
-Name            | Removed           | Engineering                                                                                             | Greater Los Angeles Area                     
-Name            | Removed           | Principal                                                                                               | Greater Boston Area                          
-Name            | Removed           | Account Manager                                                                                         | Greater New York City Area                   
-Name            | Removed           | Senior Director, Human Resources                                                                        | Greater New York City Area                   
-Name            | Removed           | Experienced content creator and product marketing manager                                               | Dallas/Fort Worth Area                       
-Name            | Removed           | Director of Software Engineering                                                                        | Greater Philadelphia Area                    
-Name            | Removed           | Student Success Advisor                                                                                 | Tampa/St. Petersburg, Florida Area           
-Name            | Removed           | B2B Marketing Manager                                                                                   | Albany, New York Area                        
-Name            | Removed           | Project Editor                                                                                          | Albany, New York Area                        
+Name           | Headline                                                                                                | Location                                     
+========================================================================================================================================================================
+Name           | CEO                                                                                                     | Greater Chicago Area                         
+Name           | Growth-focused CMO & GM                                                                                 | San Francisco Bay Area                       
+Name           | Recruiting Manager                                                                                      | Norfolk, Virginia Area                       
+Name           | Founder                                                                                                 | Other                                        
+Name           | Customer Success executive & team leader passionate about growing mission-driven, technology businesses | San Francisco Bay Area                       
+Name           | Engineering                                                                                             | Greater Los Angeles Area                     
+Name           | Principal                                                                                               | Greater Boston Area                          
+Name           | Account Manager                                                                                         | Greater New York City Area                   
+Name           | Senior Director, Human Resources                                                                        | Greater New York City Area                   
+Name           | Experienced content creator and product marketing manager                                               | Dallas/Fort Worth Area                       
+Name           | Director of Software Engineering                                                                        | Greater Philadelphia Area                    
+Name           | Student Success Advisor                                                                                 | Tampa/St. Petersburg, Florida Area           
+Name           | B2B Marketing Manager                                                                                   | Albany, New York Area                        
+Name           | Project Editor                                                                                          | Albany, New York Area                        
 
 ```
