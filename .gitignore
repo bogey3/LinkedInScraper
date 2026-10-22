@@ -1,1 +1,11 @@
 *.cookies
+*.json
+*.csv
+
+.idea
+
+# packaging / python
+build/
+dist/
+*.egg-info/
+__pycache__/
