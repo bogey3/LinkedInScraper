@@ -419,15 +419,31 @@ def write_records(path, records):
         writer.writerows(record_cells(rec, columns) for rec in records)
 
 
+def write_emails(path, records):
+    """Write the generated addresses as plain text, one per line: unique, in order, skipping people
+    without one. Returns how many were written; with none, the file is left alone."""
+    emails = list(dict.fromkeys(rec["email"] for rec in records if rec.get("email")))
+    if emails:
+        with open(path, "w", encoding="utf-8", newline="\n") as f:
+            f.write("\n".join(emails) + "\n")
+    return len(emails)
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(prog="linkedin-names", description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("input", help="scraper JSON or CSV file")
-    ap.add_argument("-o", "--output", required=True, metavar="CSV", help="file to write (overwritten)")
+    ap.add_argument("-o", "--output", metavar="CSV", help="results CSV to write (overwritten)")
     ap.add_argument("-f", "--email-format", metavar="TEMPLATE", help='e.g. "{f}.{last}@example.com"')
+    ap.add_argument("-eo", "--email-out", metavar="TXT",
+                    help="text file of the generated email addresses, one per line (needs -f; overwritten)")
     ap.add_argument("--review", action="store_true", help="print rows flagged for review")
     args = ap.parse_args(argv)
 
+    if not (args.output or args.email_out):
+        ap.error("nothing to write: give -o (results CSV) and/or -eo (email list)")
+    if args.email_out and not args.email_format:
+        ap.error("-eo/--email-out needs -f/--email-format to say how to build the addresses")
     if args.email_format:
         try:
             template_fields(args.email_format)
@@ -441,12 +457,17 @@ def main(argv=None):
 
     records = build_records(rows, args.email_format)
     try:
-        write_records(args.output, records)
+        if args.output:
+            write_records(args.output, records)
+        emails_written = write_emails(args.email_out, records) if args.email_out else None
     except OSError as exc:
-        print(f"error: cannot write {args.output}: {exc}", file=sys.stderr)
+        print(f"error: cannot write output: {exc}", file=sys.stderr)
         return 1
 
-    print(f"{summary(records, args.email_format)} -> {args.output}")
+    print(summary(records, args.email_format) + (f" -> {args.output}" if args.output else ""))
+    if args.email_out:
+        print(f"{emails_written} email addresses -> {args.email_out}" if emails_written
+              else f"no email addresses were generated, so {args.email_out} was not written")
     if args.review:
         for r in records:
             if r["needs_review"]:

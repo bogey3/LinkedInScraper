@@ -1,6 +1,7 @@
 *.cookies
 *.json
 *.csv
+*.txt
 
 .idea
 

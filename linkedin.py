@@ -537,10 +537,12 @@ def parse_args(argv=None):
             examples:
               %(prog)s -c 1234567 -o employees.csv
               %(prog)s -s "Acme Corp" -o employees.csv -f "{f}.{last}@example.com"
+              %(prog)s -c 1234567 -f "{first}.{last}@example.com" -eo emails.txt
 
             files are only written where you ask: -o is the results CSV (First, Middle, Last, Email, Email Note,
             Credentials, Alt Name, Review, Name, Headline, Location, Current, Connection, Profile URL; Email and
-            Email Note need -f), --json-out and --dump-raw are optional extras.
+            Email Note need -f), -eo is a plain text list of the generated addresses, and --json-out and
+            --dump-raw are optional extras.
 
             -s searches LinkedIn for companies by name and shows a menu to pick one; it prints the
             company ID it chose so later runs can skip the search with -c.
@@ -560,6 +562,8 @@ def parse_args(argv=None):
     parser.add_argument("-p", "--password", help="LinkedIn password")
     parser.add_argument("--clear", action="store_true", help="clear stored cookies and force a fresh login")
     parser.add_argument("-f", "--email-format", metavar="TEMPLATE", help='generate emails, e.g. "{f}.{last}@example.com"')
+    parser.add_argument("-eo", "--email-out", metavar="TXT",
+                        help="text file of the generated email addresses, one per line, no duplicates (needs -f; overwritten each run)")
     parser.add_argument("--json-out", metavar="JSON", help="also save the raw scrape as JSON")
     parser.add_argument("--dump-raw", metavar="JSON",
                         help="save the first raw search response (and, with -s, the company search as <name>-companies.json) "
@@ -568,6 +572,8 @@ def parse_args(argv=None):
     parser.add_argument("-v", "--verbose", action="store_true", help="debug logging")
     args = parser.parse_args(argv)
 
+    if args.email_out and not args.email_format:
+        parser.error("-eo/--email-out needs -f/--email-format to say how to build the addresses")
     if args.email_format:
         try:
             import names
@@ -638,8 +644,20 @@ def main(argv=None):
         records = names_module.build_records(employees, args.email_format)
     print_table(employees, [r["email"] for r in records] if records else None)
     if records:
-        print(f"\n{names_module.summary(records, args.email_format)}"
-              + (f" -> {args.outfile}" if args.outfile else " (no -o given, so nothing was saved)"))
+        print(f"\n{names_module.summary(records, args.email_format)}" + (f" -> {args.outfile}" if args.outfile else ""))
+        if args.email_out:
+            try:
+                count = names_module.write_emails(args.email_out, records)
+            except OSError as exc:
+                log.error("Cannot write %s: %s", args.email_out, exc)
+                status = status or 1
+            else:
+                if count:
+                    print(f"{count} email addresses -> {args.email_out}")
+                else:
+                    log.warning("No email addresses were generated, so %s was not written", args.email_out)
+        if not (args.outfile or args.email_out):
+            print("(no -o or -eo given, so nothing was saved)")
     elif args.outfile:
         print(f"\n{len(employees)} employees -> {args.outfile}")
     return status

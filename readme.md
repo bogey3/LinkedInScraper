@@ -29,9 +29,10 @@ This provides two commands:
 linkedin-scraper -s "Acme Corp" -f "{f}.{last}@example.com"
 linkedin-scraper -s "Acme Corp" -o employees.csv -f "{f}.{last}@example.com"
 linkedin-scraper -c 1234567 -o employees.csv
-linkedin-names employees.csv -f "{last}.{first}@example.com" -o people.csv
+linkedin-scraper -c 1234567 -f "{first}.{last}@example.com" -eo emails.txt
+linkedin-names employees.csv -f "{last}.{first}@example.com" -o people.csv -eo emails.txt
 ```
-Files are written only where you ask: `-o` is the results file, and nothing else is created unless you pass `--json-out` or `--dump-raw`.
+Files are written only where you ask: `-o` is the results CSV and `-eo` is a plain list of emails; nothing else is created unless you pass `--json-out` or `--dump-raw`.
 
 | Option | |
 |---|---|
@@ -39,6 +40,7 @@ Files are written only where you ask: `-o` is the results file, and nothing else
 | `-s`, `--search NAME` | Search for a company by name and pick it from a menu (prints the ID it chose, so later runs can use `-c`) |
 | `-o`, `--outfile CSV` | The results CSV (see [Output](#output); overwritten each run). Without it, results are only shown on the console |
 | `-f`, `--email-format TEMPLATE` | Generate email addresses, e.g. `{f}.{last}@example.com` |
+| `-eo`, `--email-out TXT` | A plain text file of the generated addresses: one per line, no duplicates, nobody without an address. Needs `-f`; works with or without `-o` (overwritten each run) |
 | `--json-out JSON` | Also save the raw scrape as JSON |
 | `-u`, `-p` | LinkedIn username / password (or `LINKEDIN_USERNAME` / `LINKEDIN_PASSWORD`) |
 | `--clear` | Forget the stored session and log in again |
@@ -83,4 +85,10 @@ The `-o` CSV is the whole product, one row per person:
 
 Rows are written as they arrive, so a failure or Ctrl+C keeps what was collected. If duplicate addresses turn up, the file is rewritten once at the end to mark them; if it's open in Excel at that point, the first copy is kept and you get a warning. Text that begins with `=`, `+`, `-` or `@` is prefixed with `'` so spreadsheets don't read it as a formula. Without the `nameparser` package you get just `Name` and the LinkedIn fields, with a warning.
 
-`linkedin-names` produces the same file from an earlier scrape (its `-o` is required).
+`linkedin-names` produces the same file from an earlier scrape. Give it `-o`, `-eo`, or both.
+
+The `-eo` file is just the addresses, ready to paste into another tool:
+```
+j.smith@example.com
+r.patel@example.com
+```
